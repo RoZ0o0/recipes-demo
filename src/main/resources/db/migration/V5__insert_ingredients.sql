@@ -1,0 +1,16 @@
+INSERT INTO ingredient (name, quantity, unit, recipe_id) VALUES
+ ('Flour', 200, 'G', 1),
+ ('Milk', 300, 'ML', 1),
+ ('Egg', 2, 'PIECE', 1),
+ ('Sugar', 2, 'TBSP', 1),
+ ('Butter', 30, 'G', 1),
+ ('Spaghetti', 400, 'G', 2),
+ ('Egg', 3, 'PIECE', 2),
+ ('Parmesan Cheese', 100, 'G', 2),
+ ('Pancetta', 150, 'G', 2),
+ ('Black Pepper', 1, 'TSP', 2),
+ ('Dark Chocolate', 200, 'G', 3),
+ ('Butter', 150, 'G', 3),
+ ('Egg', 4, 'PIECE', 3),
+ ('Sugar', 100, 'G', 3),
+ ('Flour', 50, 'G', 3);

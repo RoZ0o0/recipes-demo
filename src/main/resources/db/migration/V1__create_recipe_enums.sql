@@ -1,0 +1,2 @@
+CREATE TYPE difficulty AS ENUM ('EASY', 'MEDIUM', 'HARD');
+CREATE TYPE unit AS ENUM ('G','KG','ML','CUP','TBSP','TSP','PIECE');
