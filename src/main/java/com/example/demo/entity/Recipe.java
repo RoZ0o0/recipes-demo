@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -31,7 +33,6 @@ public class Recipe {
 
     @NotNull
     @NotBlank
-    @Lob
     @Column(nullable = false)
     private String description;
 
@@ -43,7 +44,8 @@ public class Recipe {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "difficulty")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private Difficulty difficulty;
 
     private Integer preparationTime;
