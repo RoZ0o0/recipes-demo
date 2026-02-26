@@ -305,6 +305,38 @@ components:
           description: Number of recipes per page
           example: 10
 
+    ApiError:
+      type: object
+      description: "Standardized error response returned by the API for failed requests"
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: "Time when the error occurred"
+          example: "2026-02-26T15:45:30.123Z"
+        status:
+          type: integer
+          description: "HTTP status code of the error"
+          example: 400
+        error:
+          type: string
+          description: "Short description of the HTTP error"
+          example: "Bad Request"
+        message:
+          type: string
+          description: "Detailed message describing the error"
+          example: "Recipe name must not be empty"
+        details:
+          type: object
+          description: "Optional additional details about the error"
+          example:
+            field: "name"
+            issue: "must not be blank"
+        path:
+          type: string
+          description: "The request path that caused the error"
+          example: "/recipe"
+
     Difficulty:
       type: string
       enum:

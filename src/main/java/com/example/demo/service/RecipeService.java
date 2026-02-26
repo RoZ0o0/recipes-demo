@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.entity.Ingredient;
 import com.example.demo.entity.Recipe;
+import com.example.demo.exception.IngredientNotInRecipeException;
+import com.example.demo.exception.RecipeNotFoundException;
 import com.example.demo.mapper.IngredientMapper;
 import com.example.demo.mapper.RecipeMapper;
 import com.example.demo.models.*;
@@ -12,10 +14,8 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class RecipeService {
 
     public void deleteRecipeById(Long recipeId) {
         if (!recipeRepository.existsById(recipeId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new RecipeNotFoundException(recipeId);
         }
 
         recipeRepository.deleteById(recipeId);
@@ -50,7 +50,7 @@ public class RecipeService {
 
     public RecipeResponse getRecipe(Long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+                .orElseThrow(() -> new RecipeNotFoundException(recipeId));
         return recipeMapper.toResponse(recipe);
     }
 
@@ -72,7 +72,7 @@ public class RecipeService {
     @Transactional
     public RecipeResponse updateRecipeById(Long recipeId, RecipeUpdateRequest recipeUpdateRequest) {
         Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recipe not found"));
+                .orElseThrow(() -> new RecipeNotFoundException(recipeId));
 
         recipeMapper.updateFromRequest(recipeUpdateRequest, recipe);
 
@@ -95,10 +95,7 @@ public class RecipeService {
                 Ingredient existing = existingById.get(req.getId());
 
                 if (existing == null) {
-                    throw new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST,
-                            "Ingredient not found: " + req.getId()
-                    );
+                    throw new IngredientNotInRecipeException(req.getId(), recipe.getId());
                 }
 
                 ingredientMapper.updateFromRequest(req, existing);
