@@ -5,6 +5,7 @@ info:
   description: API for managing recipes and their ingredients
 tags:
   - name: Recipe
+  - name: Request
 paths:
   /recipe:
     get:
@@ -144,6 +145,21 @@ paths:
           description: Recipe not found
         '500':
           description: Internal server error
+
+  /request/count:
+    get:
+      summary: Get total count of requests
+      operationId: getRequestCount
+      tags:
+        - Request
+      responses:
+        '200':
+          description: Successfully fetched request count
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
 
 components:
   schemas:

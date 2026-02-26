@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecipeController implements RecipeApi {
     private final RecipeService recipeService;
 
-
     @Override
     public ResponseEntity<RecipeResponse> createRecipe(RecipeRequest recipeRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(recipeService.createRecipe(recipeRequest));
