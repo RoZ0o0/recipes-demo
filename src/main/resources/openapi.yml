@@ -10,6 +10,7 @@ paths:
   /recipe:
     get:
       summary: Get paginated recipes with search
+      description: Returns a paginated list of recipes, supports optional search.
       operationId: searchRecipes
       tags:
         - Recipe
@@ -20,22 +21,22 @@ paths:
           schema:
             type: integer
             minimum: 0
-          description: Zero-based page index
+          description: Zero-based page index to fetch
         - name: size
           in: query
           required: true
           schema:
             type: integer
             minimum: 1
-          description: The size of the page to be returned
+          description: Number of recipes to return per page
         - name: search
           in: query
-          description: Search term to filter recipes
           schema:
             type: string
+          description: Optional search term to filter recipes by name or ingredient
       responses:
         '200':
-          description: Paginated recipes
+          description: Paginated list of recipes matching search criteria
           content:
             application/json:
               schema:
@@ -46,18 +47,20 @@ paths:
           description: Internal server error
     post:
       summary: Create a new recipe
+      description: Creates a new recipe with name, description, difficulty, preparation time, and ingredients.
       operationId: createRecipe
       tags:
         - Recipe
       requestBody:
         required: true
+        description: Recipe data to be created
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RecipeRequest'
       responses:
         '201':
-          description: Successfully created recipe
+          description: Recipe successfully created
           content:
             application/json:
               schema:
@@ -70,6 +73,7 @@ paths:
   /recipe/{recipeId}:
     get:
       summary: Get recipe by ID
+      description: Fetch a single recipe by its unique ID.
       operationId: getRecipe
       tags:
         - Recipe
@@ -80,21 +84,23 @@ paths:
           schema:
             type: integer
             format: int64
+          description: Unique identifier of the recipe to fetch
       responses:
         '200':
-          description: Recipe found
+          description: Recipe found successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipeResponse'
         '400':
-          description: Invalid recipe id supplied
+          description: Invalid recipe ID supplied
         '404':
           description: Recipe not found
         '500':
           description: Internal server error
     put:
       summary: Update an existing recipe
+      description: Update an existing recipe by ID. All fields in the request body will replace current values.
       operationId: updateRecipe
       tags:
         - Recipe
@@ -105,15 +111,17 @@ paths:
           schema:
             type: integer
             format: int64
+          description: Unique identifier of the recipe to update
       requestBody:
         required: true
+        description: Updated recipe data
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RecipeUpdateRequest'
       responses:
         '200':
-          description: Successfully updated recipe
+          description: Recipe successfully updated
           content:
             application/json:
               schema:
@@ -126,6 +134,7 @@ paths:
           description: Internal server error
     delete:
       summary: Delete recipe by id
+      description: Deletes a recipe identified by its unique ID.
       operationId: deleteRecipe
       tags:
         - Recipe
@@ -136,9 +145,10 @@ paths:
           schema:
             type: integer
             format: int64
+          description: Unique identifier of the recipe to delete
       responses:
         '204':
-          description: Successfully deleted the recipe
+          description: Recipe successfully deleted
         '400':
           description: Invalid recipe ID supplied
         '404':
@@ -149,12 +159,13 @@ paths:
   /request/count:
     get:
       summary: Get total count of requests
+      description: Returns the total number of HTTP requests processed by the server.
       operationId: getRequestCount
       tags:
         - Request
       responses:
         '200':
-          description: Successfully fetched request count
+          description: Successfully fetched the request count
           content:
             application/json:
               schema:
@@ -175,18 +186,22 @@ components:
         name:
           type: string
           maxLength: 255
-          example: "Curry"
+          description: The name of the recipe
+          example: Curry
         description:
           type: string
-          example: "Chop onions, fry spices, add vegetables, simmer for 20 minutes..."
+          description: Step-by-step preparation instructions
+          example: Chop onions, fry spices, add vegetables, simmer for 20 minutes...
         difficulty:
           $ref: '#/components/schemas/Difficulty'
         preparationTime:
           type: integer
-          description: Time in minutes
+          description: Time in minutes required to prepare the recipe
+          example: 25
         ingredients:
           type: array
           minItems: 1
+          description: List of ingredients required for the recipe
           items:
             $ref: '#/components/schemas/IngredientRequest'
 
@@ -199,6 +214,7 @@ components:
             ingredients:
               type: array
               minItems: 1
+              description: Updated list of ingredients for the recipe
               items:
                 $ref: '#/components/schemas/IngredientUpdateRequest'
 
@@ -211,9 +227,12 @@ components:
             id:
               type: integer
               format: int64
+              description: Unique identifier of the recipe
+              example: 123
             ingredients:
               type: array
               minItems: 1
+              description: List of ingredients with IDs
               items:
                 $ref: '#/components/schemas/IngredientResponse'
 
@@ -227,10 +246,13 @@ components:
         name:
           type: string
           maxLength: 60
-          example: "Egg"
+          description: Name of the ingredient
+          example: Egg
         quantity:
           type: number
           format: double
+          description: Amount of the ingredient
+          example: 2
         unit:
           $ref: '#/components/schemas/Unit'
 
@@ -243,6 +265,8 @@ components:
             id:
               type: integer
               format: int64
+              description: Unique identifier of the ingredient
+              example: 45
 
     IngredientResponse:
       type: object
@@ -253,22 +277,33 @@ components:
             id:
               type: integer
               format: int64
+              description: Unique identifier of the ingredient
+              example: 45
 
     PaginatedRecipeResponse:
       type: object
       properties:
         content:
           type: array
+          description: List of recipes in this page
           items:
             $ref: '#/components/schemas/RecipeResponse'
         totalElements:
           type: integer
+          description: Total number of recipes across all pages
+          example: 100
         totalPages:
           type: integer
+          description: Total number of pages available
+          example: 10
         number:
           type: integer
+          description: Current page number (0-based)
+          example: 0
         size:
           type: integer
+          description: Number of recipes per page
+          example: 10
 
     Difficulty:
       type: string
@@ -276,6 +311,8 @@ components:
         - EASY
         - MEDIUM
         - HARD
+      description: Difficulty level of the recipe
+      example: EASY
 
     Unit:
       type: string
@@ -287,3 +324,5 @@ components:
         - TBSP
         - TSP
         - PIECE
+      description: Unit of measurement for the ingredient
+      example: PIECE
