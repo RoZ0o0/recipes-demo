@@ -1,10 +1,7 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
@@ -25,20 +22,17 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "Recipe name must not be empty")
     @Size(max = 255)
     @Column(nullable = false)
     private String name;
 
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "Recipe description must not be empty")
     @Column(nullable = false)
     private String description;
 
     @NotNull
     @NotEmpty(message = "Recipe must have at least one ingredient")
-    @Column(nullable = false)
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Ingredient> ingredients;
 
@@ -48,6 +42,7 @@ public class Recipe {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     private Difficulty difficulty;
 
+    @Positive(message = "Preparation time must be at least 1 minute")
     private Integer preparationTime;
 
     @CreationTimestamp

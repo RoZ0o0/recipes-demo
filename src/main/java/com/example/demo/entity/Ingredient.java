@@ -1,9 +1,7 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -20,13 +18,13 @@ public class Ingredient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @NotBlank
-    @Size(max = 60)
+    @NotBlank(message = "Ingredient name must not be empty")
+    @Size(max = 60, message = "Ingredient name must be at most 60 characters")
     @Column(nullable = false)
     private String name;
 
     @NotNull
+    @Positive(message = "Quantity must be at least 1")
     @Column(nullable = false)
     private Double quantity;
 
@@ -37,6 +35,7 @@ public class Ingredient {
     private Unit unit;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
