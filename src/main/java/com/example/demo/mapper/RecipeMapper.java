@@ -1,20 +1,20 @@
 package com.example.demo.mapper;
 
 import com.example.demo.entity.Recipe;
+import com.example.demo.models.PaginatedRecipeResponse;
 import com.example.demo.models.RecipeRequest;
 import com.example.demo.models.RecipeResponse;
 import com.example.demo.models.RecipeUpdateRequest;
 import org.mapstruct.*;
 import org.openapitools.jackson.nullable.JsonNullable;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = IngredientMapper.class)
 public interface RecipeMapper {
 
     RecipeResponse toResponse(Recipe recipe);
 
-    List<RecipeResponse> toResponse(List<Recipe> recipes);
+    PaginatedRecipeResponse toResponse(Page<Recipe> recipes);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

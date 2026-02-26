@@ -6,7 +6,12 @@ import com.example.demo.mapper.IngredientMapper;
 import com.example.demo.mapper.RecipeMapper;
 import com.example.demo.models.*;
 import com.example.demo.repository.RecipeRepository;
+import com.example.demo.specification.RecipeSpecifications;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +54,19 @@ public class RecipeService {
         return recipeMapper.toResponse(recipe);
     }
 
-    public List<RecipeResponse> getRecipes() {
-        return recipeMapper.toResponse(recipeRepository.findAll());
+    public PaginatedRecipeResponse searchRecipes(Integer page, Integer size, @Nullable String search) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        if(search == null || search.trim().isEmpty()) {
+            Page<Recipe> recipePage = recipeRepository.findAll(pageable);
+            return recipeMapper.toResponse(recipePage);
+        }
+
+        Page<Recipe> recipePage = recipeRepository.findAll(
+                RecipeSpecifications.searchRecipe(search), pageable
+        );
+
+        return recipeMapper.toResponse(recipePage);
     }
 
     @Transactional

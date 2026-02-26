@@ -1,16 +1,16 @@
 package com.example.demo.controller;
 
 import com.example.demo.api.RecipeApi;
+import com.example.demo.models.PaginatedRecipeResponse;
 import com.example.demo.models.RecipeRequest;
 import com.example.demo.models.RecipeResponse;
 import com.example.demo.models.RecipeUpdateRequest;
 import com.example.demo.service.RecipeService;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,8 +36,8 @@ public class RecipeController implements RecipeApi {
     }
 
     @Override
-    public ResponseEntity<List<RecipeResponse>> getRecipes() {
-        return ResponseEntity.ok(recipeService.getRecipes());
+    public ResponseEntity<PaginatedRecipeResponse> searchRecipes(Integer page, Integer size, @Nullable String search) {
+        return ResponseEntity.ok(recipeService.searchRecipes(page, size, search));
     }
 
     @Override
