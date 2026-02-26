@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.OffsetDateTime;
 import java.util.List;
