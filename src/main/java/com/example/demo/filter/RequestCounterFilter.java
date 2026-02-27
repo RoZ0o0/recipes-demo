@@ -22,4 +22,8 @@ public class RequestCounterFilter implements Filter {
     public long getRequestCount() {
         return requestCount.get();
     }
+
+    public void resetRequestCount() {
+        requestCount.set(0);
+    }
 }
