@@ -11,3 +11,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/recipes_demo_db
     username: postgres
     password: postgres
+  security:
+    user:
+      name: admin
+      password: $2a$12$TERxdg4uBqg9xO3wU57hIOB01U8gnE1vH3fArMWn9wgsNelH/u4rC
+      roles: USER
+
