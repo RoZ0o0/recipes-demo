@@ -8,7 +8,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: jdbc:postgresql://localhost:5432/recipes_demo_db
+    url: jdbc:postgresql://recipes-demo-postgres:5432/recipes_demo_db
     username: postgres
     password: postgres
   security:
