@@ -14,13 +14,15 @@ public class RecipeSpecifications {
 
             Join<Recipe, Ingredient> ingredientJoin = r.join("ingredients");
 
+            if (q != null) {
+                q.distinct(true);
+            }
+
             return cb.or(
                     cb.like(cb.lower(r.get("name")), like),
                     cb.like(
                         cb.lower(
-                            cb.function("LOWER", String.class,
-                                    cb.function("TEXT", String.class, r.get("difficulty"))
-                            )
+                            cb.function("TEXT", String.class, r.get("difficulty"))
                         ),
                         like
                     ),
