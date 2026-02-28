@@ -35,8 +35,8 @@ public class RecipeController implements RecipeApi {
     }
 
     @Override
-    public ResponseEntity<PaginatedRecipeResponse> searchRecipes(Integer page, Integer size, @Nullable String search) {
-        return ResponseEntity.ok(recipeService.searchRecipes(page, size, search));
+    public ResponseEntity<PaginatedRecipeResponse> searchRecipes(Integer page, Integer size, @Nullable String search, @Nullable String sortBy, String direction) {
+        return ResponseEntity.ok(recipeService.searchRecipes(page, size, search, sortBy, direction));
     }
 
     @Override

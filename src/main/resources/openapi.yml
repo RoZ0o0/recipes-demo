@@ -34,6 +34,21 @@ paths:
           schema:
             type: string
           description: Optional search term to filter recipes by name or ingredient
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+            example: name
+          description: Field to sort by (e.g., name, difficulty)
+        - name: direction
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ asc, desc ]
+            default: asc
+          description: Sort direction (ascending or descending)
       responses:
         '200':
           description: Paginated list of recipes matching search criteria

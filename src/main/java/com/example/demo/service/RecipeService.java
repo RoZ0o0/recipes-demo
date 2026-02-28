@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,8 +55,21 @@ public class RecipeService {
         return recipeMapper.toResponse(recipe);
     }
 
-    public PaginatedRecipeResponse searchRecipes(Integer page, Integer size, @Nullable String search) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PaginatedRecipeResponse searchRecipes(
+            Integer page,
+            Integer size,
+            @Nullable String search,
+            @Nullable String sortBy,
+            String direction
+    ) {
+        Sort sort = Sort.by(
+            direction != null && direction.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC,
+            sortBy != null ? sortBy : "name"
+        );
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         if(search == null || search.trim().isEmpty()) {
             Page<Recipe> recipePage = recipeRepository.findAll(pageable);
