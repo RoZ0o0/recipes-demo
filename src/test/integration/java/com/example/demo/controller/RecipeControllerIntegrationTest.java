@@ -62,6 +62,24 @@ class RecipeControllerIntegrationTest {
         recipe.setIngredients(List.of(ingredient));
 
         savedRecipe = recipeRepository.save(recipe);
+
+        Recipe recipe2 = Recipe.builder()
+                .name("Salad")
+                .description("Add vegetables...")
+                .difficulty(Recipe.Difficulty.EASY)
+                .preparationTime(10)
+                .build();
+
+        Ingredient ingredient2 = Ingredient.builder()
+                .name("Cabbage")
+                .quantity(200.0)
+                .unit(Ingredient.Unit.G)
+                .recipe(recipe2)
+                .build();
+
+        recipe2.setIngredients(List.of(ingredient2));
+
+        recipeRepository.save(recipe2);
     }
 
     @AfterEach
@@ -93,7 +111,7 @@ class RecipeControllerIntegrationTest {
                 .body("$", notNullValue())
                 .body("name", equalTo("Classic Pancakes"));
 
-        assertThat(recipeRepository.findAll().size(), equalTo(2));
+        assertThat(recipeRepository.findAll().size(), equalTo(3));
     }
 
     @Test
@@ -118,7 +136,7 @@ class RecipeControllerIntegrationTest {
             .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
 
-        assertThat(recipeRepository.findAll().size(), equalTo(1));
+        assertThat(recipeRepository.findAll().size(), equalTo(2));
     }
 
     @Test
@@ -129,7 +147,7 @@ class RecipeControllerIntegrationTest {
             .then()
                 .statusCode(HttpStatus.OK.value());
 
-        assertThat(recipeRepository.findAll().size(), equalTo(0));
+        assertThat(recipeRepository.findAll().size(), equalTo(1));
     }
 
     @Test
@@ -140,7 +158,7 @@ class RecipeControllerIntegrationTest {
             .then()
                 .statusCode(HttpStatus.NOT_FOUND.value());
 
-        assertThat(recipeRepository.findAll().size(), equalTo(1));
+        assertThat(recipeRepository.findAll().size(), equalTo(2));
     }
 
     @Test
@@ -172,15 +190,17 @@ class RecipeControllerIntegrationTest {
             .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("content", is(not(empty())))
-                .body("totalElements", equalTo(1));
+                .body("totalElements", equalTo(2));
     }
 
     @Test
-    void searchRecipes_shouldReturnFilteredRecipesPaginated_whenSearchIsProvided() {
+    void searchRecipes_shouldReturnFilteredRecipesPaginatedWithSort() {
         givenAuthenticated()
                 .param("page", 0)
                 .param("size", 10)
                 .param("search", savedRecipe.getName())
+                .param("sortBy", "name")
+                .param("direction", "asc")
             .when()
                 .get("/recipe")
             .then()
@@ -197,6 +217,35 @@ class RecipeControllerIntegrationTest {
                 .get("/recipe")
             .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    void searchRecipes_shouldReturnSortedDesc() {
+        givenAuthenticated()
+                .param("page", 0)
+                .param("size", 10)
+                .param("sortBy", "name")
+                .param("direction", "desc")
+            .when()
+                .get("/recipe")
+            .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("content[0].name", equalTo("Salad"))
+                .body("content[1].name", equalTo("Curry"));
+    }
+
+    @Test
+    void searchRecipes_shouldUseDefaultSortField_whenSortByNotProvided() {
+        givenAuthenticated()
+                .param("page", 0)
+                .param("size", 10)
+                .param("direction", "asc")
+            .when()
+                .get("/recipe")
+                .then()
+            .statusCode(HttpStatus.OK.value())
+                .body("content[0].name", equalTo("Curry"))
+                .body("content[1].name", equalTo("Salad"));
     }
 
     @Test

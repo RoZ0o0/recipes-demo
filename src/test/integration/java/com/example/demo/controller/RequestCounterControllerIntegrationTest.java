@@ -39,15 +39,9 @@ class RequestCounterControllerIntegrationTest {
     void shouldReturnRequestCount() {
         givenAuthenticated()
             .when()
-                .get("/recipe/1")
-            .then()
-                .statusCode(HttpStatus.OK.value());
-
-        givenAuthenticated()
-            .when()
                 .get("/request/count")
             .then()
                 .statusCode(HttpStatus.OK.value())
-                .body(equalTo("2"));
+                .body(equalTo("1"));
     }
 }

@@ -10,14 +10,12 @@ import com.example.demo.models.*;
 import com.example.demo.repository.RecipeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -113,10 +111,10 @@ class RecipeServiceTest {
         Recipe recipe2 = Recipe.builder().id(2L).build();
 
         Page<Recipe> recipePage = new PageImpl<>(List.of(recipe1, recipe2), pageable, 2);
-        when(recipeRepository.findAll(pageable)).thenReturn(recipePage);
+        when(recipeRepository.findAll(any(Pageable.class))).thenReturn(recipePage);
         when(recipeMapper.toResponse(recipePage)).thenReturn(new PaginatedRecipeResponse().totalElements(2));
 
-        PaginatedRecipeResponse response = recipeService.searchRecipes(0, 2, null);
+        PaginatedRecipeResponse response = recipeService.searchRecipes(0, 2, null, null, null);
 
         assertNotNull(response);
         assertEquals(2, response.getTotalElements());
@@ -129,13 +127,54 @@ class RecipeServiceTest {
         Recipe recipe2 = Recipe.builder().id(2L).build();
 
         Page<Recipe> recipePage = new PageImpl<>(List.of(recipe1, recipe2), pageable, 2);
-        when(recipeRepository.findAll(ArgumentMatchers.<Specification<Recipe>>any(), eq(pageable))).thenReturn(recipePage);
+        when(recipeRepository.findAll(ArgumentMatchers.<Specification<Recipe>>any(), any(Pageable.class))).thenReturn(recipePage);
         when(recipeMapper.toResponse(recipePage)).thenReturn(new PaginatedRecipeResponse().totalElements(2));
 
-        PaginatedRecipeResponse response = recipeService.searchRecipes(0, 2, "test");
+        PaginatedRecipeResponse response = recipeService.searchRecipes(0, 2, "test", null, null);
 
         assertNotNull(response);
         assertEquals(2, response.getTotalElements());
+    }
+
+    @Test
+    void searchRecipes_shouldSortDescending_whenDirectionDesc() {
+        Page<Recipe> recipePage = new PageImpl<>(List.of());
+
+        when(recipeRepository.findAll(any(Pageable.class))).thenReturn(recipePage);
+        when(recipeMapper.toResponse(recipePage)).thenReturn(new PaginatedRecipeResponse());
+
+        recipeService.searchRecipes(0, 2, null, "name", "desc");
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(recipeRepository).findAll(captor.capture());
+
+        Pageable usedPageable = captor.getValue();
+
+        Sort.Order order = usedPageable.getSort().getOrderFor("name");
+
+        assertNotNull(order);
+        assertEquals(Sort.Direction.DESC, order.getDirection());
+    }
+
+    @Test
+    void searchRecipes_shouldUseDefaultSortField_whenSortByNull() {
+        Page<Recipe> recipePage = new PageImpl<>(List.of());
+
+        when(recipeRepository.findAll(any(Pageable.class))).thenReturn(recipePage);
+        when(recipeMapper.toResponse(recipePage)).thenReturn(new PaginatedRecipeResponse());
+
+        recipeService.searchRecipes(0, 10, null, null, "asc");
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(recipeRepository).findAll(captor.capture());
+
+        Pageable pageableUsed = captor.getValue();
+        Sort.Order order = pageableUsed.getSort().getOrderFor("name");
+
+        assertNotNull(order);
+        assertEquals(Sort.Direction.ASC, order.getDirection());
+        assertEquals(0, pageableUsed.getPageNumber());
+        assertEquals(10, pageableUsed.getPageSize());
     }
 
     @Test
