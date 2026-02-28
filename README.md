@@ -6,7 +6,7 @@
 - Flyway (database migrations)
 - MapStruct (DTO mapping)
 - Lombok (code generation)
-- Springdoc OpenAPI / Swagger (API docs)
+- OpenAPI tools (Springdoc + OpenAPI Generator)
 - Rest Assured & Testcontainers (testing)
 - Maven (build tool)
 - Docker + Docker Compose (containerization)
