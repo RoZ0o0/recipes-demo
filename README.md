@@ -73,9 +73,9 @@ This will compile the code, run the tests, and show a summary of results
 To stop and remove the running backend container:
 
 ```
-docker stop recipe-demo-app
+docker stop recipes-demo-app
 
-docker rm recipe-demo-app
+docker rm recipes-demo-app
 ```
 
 To stop and remove postgres container and network:
