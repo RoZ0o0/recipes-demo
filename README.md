@@ -44,7 +44,7 @@ docker compose up -d
 Build a Docker image for the backend application:
 
 ```
-docker build -t recipe-demo-app .
+docker build -t recipes-demo-app .
 ```
 
 ### 4. Run the Backend Application
@@ -52,7 +52,7 @@ docker build -t recipe-demo-app .
 Run the backend app container, connect it to the network, and expose port 8080:
 
 ```
-docker run -d --name recipe-demo-app --network recipe-demo-net -p 8080:8080 recipe-demo-app
+docker run -d --name recipes-demo-app --network recipes-demo-net -p 8080:8080 recipes-demo-app
 ```
 
 ---
