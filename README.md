@@ -1,3 +1,45 @@
+# Recipes Demo API
+
+REST API for managing recipes and ingredients.  
+The application allows creating, retrieving, updating, deleting, and searching recipes with pagination, filtering, and sorting support.
+
+The API is based on an OpenAPI specification and runs fully in Docker.
+
+---
+
+## Functional Description
+
+The system allows managing recipes and their ingredients.
+
+User can perform the following operations:
+
+- create a new recipe with ingredients
+- retrieve recipe details by ID
+- update an existing recipe and its ingredients
+- delete a recipe
+- search recipes by name or keyword
+- sort recipes by selected field (e.g. name)
+- browse recipes using pagination
+
+Each recipe contains:
+
+- name
+- description
+- difficulty level
+- preparation time (in minutes)
+- list of ingredients
+
+Each ingredient contains:
+
+- name
+- quantity
+- unit
+
+The system validates input data and returns an error when invalid data is provided.
+
+The API requires authentication to access endpoints.
+
+
 ## Technologies Used
 
 - Java 21
@@ -82,6 +124,14 @@ To stop and remove postgres container and network:
 
 ```
 docker compose down
+```
+
+---
+
+## API Base URL
+
+```
+http://localhost:8080
 ```
 
 ---
