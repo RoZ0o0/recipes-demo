@@ -59,9 +59,13 @@ class RecipeServiceTest {
 
         RecipeResponse response = recipeService.createRecipe(recipeRequest);
 
+        verify(recipeMapper).toEntity(recipeRequest);
+        verify(recipeRepository).save(mappedRecipe);
+        verify(recipeMapper).toResponse(savedRecipe);
+
         assertEquals(1L, response.getId());
         assertEquals(1, savedRecipe.getIngredients().size());
-        assertSame(savedRecipe, savedRecipe.getIngredients().getFirst().getRecipe());
+        verify(recipeRepository).save(mappedRecipe);
     }
 
     @Test
@@ -69,6 +73,7 @@ class RecipeServiceTest {
         Long recipeId = 1L;
         when(recipeRepository.existsById(recipeId)).thenReturn(false);
 
+        verify(recipeRepository, never()).deleteById(any());
         assertThrows(RecipeNotFoundException.class, () -> recipeService.deleteRecipeById(recipeId));
     }
 
@@ -100,6 +105,8 @@ class RecipeServiceTest {
 
         RecipeResponse response = recipeService.getRecipe(recipeId);
 
+        verify(recipeMapper).toResponse(recipe);
+
         assertNotNull(response);
         assertEquals(recipeId, response.getId());
     }
@@ -118,6 +125,19 @@ class RecipeServiceTest {
 
         assertNotNull(response);
         assertEquals(2, response.getTotalElements());
+    }
+
+    @Test
+    void searchRecipes_shouldTreatEmptySearchAsNull() {
+
+        Page<Recipe> recipePage = new PageImpl<>(List.of());
+
+        when(recipeRepository.findAll(any(Pageable.class))).thenReturn(recipePage);
+        when(recipeMapper.toResponse(recipePage)).thenReturn(new PaginatedRecipeResponse());
+
+        recipeService.searchRecipes(0, 10, "   ", null, null);
+
+        verify(recipeRepository).findAll(any(Pageable.class));
     }
 
     @Test

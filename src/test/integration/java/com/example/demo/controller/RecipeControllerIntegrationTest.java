@@ -12,6 +12,8 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -19,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -114,23 +117,12 @@ class RecipeControllerIntegrationTest {
         assertThat(recipeRepository.findAll().size(), equalTo(3));
     }
 
-    @Test
-    void createRecipe_shouldReturnBadRequest_WhenInvalidInputProvided() throws JsonProcessingException {
-        RecipeRequest recipeRequest = new RecipeRequest()
-                .name("Classic Pancakes")
-                .description("Fluffy homemade pancakes perfect for breakfast.")
-                .difficulty(Difficulty.EASY)
-                .preparationTime(0);
-
-        IngredientRequest ingredientRequest = new IngredientRequest()
-                .name("Milk")
-                .quantity(200.0)
-                .unit(Unit.ML);
-
-        recipeRequest.setIngredients(List.of(ingredientRequest));
+    @ParameterizedTest
+    @MethodSource("invalidRecipeRequests")
+    void createRecipe_shouldReturnBadRequest_forInvalidInput(RecipeRequest invalidRequest) throws JsonProcessingException {
 
         givenAuthenticated()
-                .body(new ObjectMapper().writeValueAsString(recipeRequest))
+                .body(new ObjectMapper().writeValueAsString(invalidRequest))
             .when()
                 .post("/recipe")
             .then()
@@ -353,5 +345,59 @@ class RecipeControllerIntegrationTest {
                 .put("/recipe/{recipeId}", savedRecipe.getId())
             .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
+    static Stream<RecipeRequest> invalidRecipeRequests() {
+        IngredientRequest validIngredient = new IngredientRequest()
+                .name("Milk")
+                .quantity(200.0)
+                .unit(Unit.ML);
+
+        return Stream.of(
+                new RecipeRequest()
+                        .name("Classic Pancakes")
+                        .description("Fluffy homemade pancakes")
+                        .difficulty(Difficulty.EASY)
+                        .preparationTime(0)
+                        .ingredients(List.of(validIngredient)),
+
+                new RecipeRequest()
+                        .name("")
+                        .description("Fluffy homemade pancakes")
+                        .difficulty(Difficulty.EASY)
+                        .preparationTime(5)
+                        .ingredients(List.of(validIngredient)),
+
+                new RecipeRequest()
+                        .name("Classic Pancakes")
+                        .description("Fluffy homemade pancakes")
+                        .difficulty(null)
+                        .preparationTime(5)
+                        .ingredients(List.of(validIngredient)),
+
+                new RecipeRequest()
+                        .name("Classic Pancakes")
+                        .description("Fluffy homemade pancakes")
+                        .difficulty(Difficulty.EASY)
+                        .preparationTime(5)
+                        .ingredients(List.of(
+                                new IngredientRequest()
+                                        .name("Milk")
+                                        .quantity(0.0)
+                                        .unit(Unit.ML)
+                        )),
+
+                new RecipeRequest()
+                        .name("Classic Pancakes")
+                        .description("Fluffy homemade pancakes")
+                        .difficulty(Difficulty.EASY)
+                        .preparationTime(5)
+                        .ingredients(List.of(
+                                new IngredientRequest()
+                                        .name("Milk")
+                                        .quantity(100.0)
+                                        .unit(null)
+                        ))
+        );
     }
 }
